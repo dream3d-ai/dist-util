@@ -1,0 +1,39 @@
+# Python-generated files
+*/__pycache__/
+__pycache__/
+*.py[oc]
+.ruff_cache
+**/__pycache__/
+
+# models
+**.bin
+**.pkl
+**.pt
+**.pth
+**.safetensors
+**.pkl
+**.log
+
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+**/.venv/** 
+
+# Secrets
+*.env*
+*.env
+*.env.runtime
+
+wandb/
+
+# Media
+*.gif
+*.mp4
+*.png
+*.jpg
+*.jpeg
+*.webp

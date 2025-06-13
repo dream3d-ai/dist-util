@@ -15,6 +15,7 @@ def broadcast_collection(
     collection: CollectionType,
     process_group: ProcessGroup | None = None,
     device: torch.device | None = None,
+    non_blocking: bool = True,
 ) -> CollectionType:
     rank = dist.get_rank(process_group)
 
@@ -35,7 +36,7 @@ def broadcast_collection(
     if rank == 0:
         collection = apply_to_collection(
             collection,
-            function=lambda t: t.to(device),
+            function=lambda t: t.to(device, non_blocking=non_blocking),
             dtype=torch.Tensor,
         )
     else:
@@ -54,7 +55,12 @@ def broadcast_collection(
     return collection
 
 
-def global_agreement(obj: Any, *, group: dist.ProcessGroup | None = None) -> bool:
+def global_agreement(
+    obj: Any,
+    *,
+    group: dist.ProcessGroup | None = None,
+    non_blocking: bool = True,
+) -> bool:
     """
     Return True iff *obj* is identical on every rank in *group* (default=WORLD).
 
@@ -81,7 +87,7 @@ def global_agreement(obj: Any, *, group: dist.ProcessGroup | None = None) -> boo
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     try:
-        payload = _scalar_tensor(obj).to(device)
+        payload = _scalar_tensor(obj).to(device, non_blocking=non_blocking)
     except (TypeError, OverflowError):  # non-scalar or huge int
         digest = hashlib.sha256(
             pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL)
